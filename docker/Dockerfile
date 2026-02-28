@@ -1,7 +1,12 @@
-# Dockerfile
 FROM nginx:latest
-COPY app/index.html /usr/share/nginx/html/index.html
-COPY app/style.css /usr/share/nginx/html/style.css
-COPY app/script.js /usr/share/nginx/html/script.js
+
+# Remove default Nginx page
+RUN rm -rf /usr/share/nginx/html/*
+
+# Copy app files
+COPY app/* /usr/share/nginx/html/
+
+# Expose port
 EXPOSE 80
+
 CMD ["nginx", "-g", "daemon off;"]

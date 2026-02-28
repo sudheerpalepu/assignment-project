@@ -14,8 +14,12 @@
         state: started
         enabled: yes
 
-    - name: Build Docker image
-      command: docker build -t myapp /home/ubuntu/project/docker
+    - name: Stop old container if running
+      command: docker rm -f myapp
+      ignore_errors: yes
 
-    - name: Run Docker container
-      command: docker run -d -p 80:80 myapp
+    - name: Run Docker container with host volume
+      command: >
+        docker run -d --name myapp -p 80:80
+        -v /home/ubuntu/project/docker/app:/usr/share/nginx/html
+        my-static-site:latest

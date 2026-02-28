@@ -25,7 +25,7 @@ jobs:
           source: "docker/"
           target: "/home/ubuntu/project"
 
-      # 3️⃣ Run Ansible to install Docker
+      # 3️⃣ Run Ansible to install Docker and deploy container
       - name: Run Ansible playbook
         uses: dawidd6/action-ansible-playbook@v2
         with:
