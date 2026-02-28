@@ -1,4 +1,4 @@
-name: CI/CD Deploy Static Site
+name: Deploy static site
 
 on:
   push:
@@ -6,41 +6,29 @@ on:
       - main
 
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      # Step 1: Checkout the repo
+      - name: Checkout repo
         uses: actions/checkout@v3
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-
-      - name: Build Docker image
-        run: |
-          docker build -t my-static-site:latest ./docker
-
-      - name: Save Docker image as tar
-        run: |
-          docker save my-static-site:latest -o site.tar
-
+      # Step 2: Copy files to EC2 using SCP
       - name: Copy files to EC2
         uses: appleboy/scp-action@v0.1.4
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ubuntu
-          key: ${{ secrets.EC2_KEY }}
+          key: ${{ secrets.EC2_KEY }}    # Paste your private key here as a secret
           port: 22
-          source: |
-            site.tar
-            ansible/deploy_site.yml
-          target: /home/ubuntu/
+          source: "docker/app/*"         # Must match your folder in the repo
+          target: "/home/ubuntu/site"    # Destination folder on EC2
 
-      - name: Run Ansible playbook on EC2
+      # Step 3: Deploy with Ansible (optional)
+      - name: Run Ansible playbook
         uses: dawidd6/action-ansible-playbook@v2
         with:
-          playbook: /home/ubuntu/deploy_site.yml
-          inventory: ${{ secrets.EC2_HOST }},  # comma is required for single host
-          user: ubuntu
-          private_key: ${{ secrets.EC2_KEY }}
+          playbook: "ansible/deploy_site.yml"
+          inventory: "ansible/inventory.ini"
           extra_args: "-e ansible_python_interpreter=/usr/bin/python3"
