@@ -1,0 +1,26 @@
+---
+- name: Deploy static site on EC2
+  hosts: web
+  become: true
+  vars:
+    site_image: my-static-site:latest
+
+  tasks:
+    - name: Stop old container if exists
+      docker_container:
+        name: my-static-site
+        state: absent
+
+    - name: Load Docker image from tar
+      command: docker load -i /home/ubuntu/site.tar
+      args:
+        warn: false
+
+    - name: Run site container
+      docker_container:
+        name: my-static-site
+        image: "{{ site_image }}"
+        state: started
+        restart_policy: always
+        ports:
+          - "80:80"
