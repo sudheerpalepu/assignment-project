@@ -1,5 +1,5 @@
 document.getElementById("btn").addEventListener("click", function() {
     const greeting = document.getElementById("greeting");
-    greeting.textContent = "Hello Docker welcome sudheer bye sudheer ";
+    greeting.textContent = "Hello Docker welcome sudheer ";
     alert("You clicked the button!");
 });
